@@ -1,0 +1,648 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!--
+      Root element
+  -->
+  <xs:element name="commands">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="tm" type="tm"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- TM wrapper tag -->
+  <!-- The purpose of this is to avoid bugs -->
+  <xs:complexType name="tm">
+    <xs:choice>
+      <xs:element name="hello_tm"
+                  type="hello_tm"/>
+      <xs:element name="eventerror"
+                  type="eventerror_tm_type"/>
+      <xs:element name="hk_tm_type"
+                  type="hk_tm_type"/>
+      <xs:element name="experiment_tm_type"
+                  type="experiment_tm_type"/>
+    </xs:choice>
+  </xs:complexType>
+  
+  <!-- basic_tm type definition -->
+  <!-- it is required for each tm -->
+  <!-- TODO: Ver exactamente como se usa en todos los tms -->
+  <xs:complexType name="basic_tm">
+    <xs:attribute name="sequencecount" type="xs:unsignedInt"
+      use="required"/>
+  </xs:complexType>
+
+  <!-- Set lost comm timer TC -->
+
+  <xs:complexType name="event">
+         <xs:sequence>
+            <xs:element name="name"
+                        type="events"/>
+            <xs:element name="time" 
+                        type="mission_time"/>
+            <xs:element name="parameterid"
+                        type="xs:nonNegativeInteger"/>        
+            <xs:element name="parametervalue1"
+                        type="xs:nonNegativeInteger"/>        
+            <xs:element name="parametervalue2"
+                        type="xs:nonNegativeInteger"/>        
+         </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="eventerror_tm_type">
+    <xs:complexContent>
+      <xs:extension base="basic_tm">
+         <xs:sequence>
+            <xs:element name="event_info"
+                        type="event"/>
+         </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+    <xs:complexType name="hello_tm">
+    <xs:complexContent>
+      <xs:extension base="basic_tm">
+          <xs:sequence>
+             <xs:element name="mission_time"
+                         type="mission_time"/>
+             <xs:element name="system_state"
+                         type="system_state_table"/>
+          </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+    <xs:complexType name="hk_tm_type">
+    <xs:complexContent>
+      <xs:extension base="basic_tm">
+          <xs:sequence>
+             <xs:element name="system_state"
+                         type="system_state_table"/>
+          </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+    <xs:complexType name="experiment_tm_type">
+    <xs:complexContent>
+      <xs:extension base="basic_tm">
+          <xs:sequence>
+             <xs:element name="mission_clock"
+                         type="mission_time"/>
+             <xs:element name="id"
+                         type="experiment_tm_id"/>
+             <xs:element name="data"
+                         type="experiment_tm_data"/>
+          </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="experimenid">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MICRO_THERMAL_SWITCH"/>
+      <xs:enumeration value="REACTION_WHEEL"/>  
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="experiment_tm_id">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MICRO_THERMAL_SWITCH"/> 
+      <xs:enumeration value="REACTION_WHEEL"/>
+      <xs:enumeration value="PLATFORM_PROTECTIONS_COMMISIONING"/>
+      <xs:enumeration value="ADCS_PROTECTIONS_COMMISSIONING"/>
+      <xs:enumeration value="ADCS_MGM_COMMISSIONING"/>
+      <xs:enumeration value="ADCS_MGT_COMMISSIONING"/>    
+    </xs:restriction>
+  </xs:simpleType>
+
+  
+  <xs:simpleType name="experiment_tm_id_NO_USE">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NONE"/>  
+      <xs:enumeration value="MTS"/>
+      <xs:enumeration value="THERMAL"/>  
+      <xs:enumeration value="REACTIONWHEEL"/>  
+      <xs:enumeration value="SOLARSENSORS"/>  
+      <xs:enumeration value="SWITCH"/>  
+      <xs:enumeration value="COMMISSIONING_ADCS_PA"/>  
+      <xs:enumeration value="COMMISSIONING_ADCS_MGM_PM"/>  
+      <xs:enumeration value="COMMISSIONING_ADCS_MGTVSMGM"/>  
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="experiment_tm_data">
+    <xs:choice>
+      <xs:element name="mts_tm_data"
+                  type="mts_tm_data"/>
+      <xs:element name="rw_tm"
+                  type="rw_tm"/>
+      <xs:element name="platform_protections_commisioning"
+                  type="platform_activation_data"/>
+      <xs:element name="adcs_protections_commissioning"
+                  type="mgm_mgt_pa_data"/>
+      <xs:element name="adcs_mgm_commissioning"
+                  type="mgm_pm_data"/>
+      <xs:element name="adcs_mgt_commissioning"
+                  type="mgm_mgt_data"/>
+    </xs:choice>
+  </xs:complexType>
+
+
+ <!-- Event command type -->
+ <!--   According to basictypes.ads  -->
+ <!--  TODO: Comprobar si son coherentes con el fichero Excel -->
+  <xs:simpleType name="events">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CHANGEMODE"/>
+      <xs:enumeration value="SEPARATIONTIMEREXPIRED"/>    <!--  Not Used -->
+      <xs:enumeration value="WATCHDOGTIMEREXPIRED"/>
+      <xs:enumeration value="COMMISSIONINGTIMEREXPIRED"/>
+      <xs:enumeration value="INITIALIZATIONDONE"/>
+      <xs:enumeration value="COMMISSIONINGDONE"/>
+      <xs:enumeration value="TCINVALID"/>
+      <xs:enumeration value="TIMEDTELECOMMANDEXECUTIONFAILURE"/>
+      <xs:enumeration value="CHANGEMODETC"/>
+      
+      <xs:enumeration value="INITIALIZATIONERROR"/>
+      <xs:enumeration value="COMMISSIONINGERROR"/>
+      <xs:enumeration value="BATTERYLOWWARNING"/>
+      <xs:enumeration value="BATTERYCRITICALWARNING"/>
+      <xs:enumeration value="BATTERYHIGHWARNING"/>
+      <xs:enumeration value="PROTECTIONERROR"/>
+      
+      <xs:enumeration value="MAGNETOMETERVALUEOUTOFRANGE"/>   <!--  Not Used -->
+      <xs:enumeration value="MAGNETORQUERVALUEOUTOFRANGE"/>   <!--  Not Used -->
+      
+      <xs:enumeration value="LOSTCOMM"/>
+      <xs:enumeration value="TC_RECEIVED"/>
+      <xs:enumeration value="NONTRUSTEDSOURCE"/>
+      <xs:enumeration value="RADIOHWERROR"/>
+
+      <xs:enumeration value="EXPERIMENTTIMEREXPIRED"/>     <!--  Not Used -->
+      <xs:enumeration value="EXPERIMENTSTARTED"/>          <!--  Not Used -->
+      <xs:enumeration value="EXPERIMENTDONE"/>
+      <xs:enumeration value="EXPERIMENTABORTED"/>
+      <xs:enumeration value="SENSORERROR"/>                <!--  Not Used -->
+      <xs:enumeration value="ACTUATORERROR"/>              <!--  Not Used -->
+
+      <xs:enumeration value="SW_ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- mission time type -->
+  <xs:simpleType name="mission_time">
+    <xs:restriction base="xs:unsignedInt"/>
+  </xs:simpleType>
+
+  <xs:complexType name="system_state_table">
+          <xs:sequence>
+             <xs:element name="current_operating_mode"
+                         type="operating_mode"/>
+             <xs:element name="current_time"
+                         type="mission_time"/>
+             <xs:element name="analog_value"
+                         type="analog_data_table"/>
+             <xs:element name="battery_status"
+                         type="battery_warning"/>
+             <xs:element name="device_active"
+                         type="status_signal_table"/>
+          </xs:sequence>
+  </xs:complexType>
+
+  <!-- operating mode type -->
+  <xs:simpleType name="operating_mode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OFF"/>
+      <xs:enumeration value="TEST"/>
+      <xs:enumeration value="AWAIT_LAUNCH"/>
+      <xs:enumeration value="LAUNCH"/>
+      <xs:enumeration value="LATENCY"/>
+      <xs:enumeration value="INITIALIZATION"/>
+      <xs:enumeration value="COMMISSIONING"/>
+      <xs:enumeration value="SAFE"/>
+      <xs:enumeration value="BEACON"/>
+      <xs:enumeration value="NOMINAL"/>
+      <xs:enumeration value="EXPERIMENT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- operating mode type -->
+  <xs:simpleType name="battery_warning">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NONE"/>
+      <xs:enumeration value="BATT_WBL"/>
+      <xs:enumeration value="BATT_WBC"/>
+      <xs:enumeration value="BATT_WBH"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- analod data type -->
+<!--   type Analog_Data is mod 2 ** 12 -->
+  <xs:simpleType name="analog_data">
+    <xs:restriction base="xs:unsignedInt">
+       <xs:minInclusive value="0"/> 
+       <xs:maxInclusive value="4095"/> 
+    </xs:restriction>
+  </xs:simpleType>
+
+    <xs:complexType name="analog_data_table">
+          <xs:sequence>
+             <xs:element name="batt_tbat1_tm" type="analog_data"/>
+             <xs:element name="batt_tbat2_tm" type="analog_data"/>
+             <xs:element name="batt_tbat3_tm" type="analog_data"/>
+             <xs:element name="batt_vbus_tm"  type="analog_data"/>
+             <xs:element name="batt_vbat_tm"  type="analog_data"/>
+             <xs:element name="psu_t_tm"      type="analog_data"/>
+             <xs:element name="p3v3_tm"       type="analog_data"/>
+             <xs:element name="p5v_tm"        type="analog_data"/>
+             <xs:element name="p15v_tm"       type="analog_data"/>
+             <xs:element name="n15v_tm"       type="analog_data"/>
+             <xs:element name="psu_ip5v_tm"   type="analog_data"/>
+             <xs:element name="psu_ip15v_tm"  type="analog_data"/>
+             <xs:element name="psu_in15v_tm"  type="analog_data"/>
+             <xs:element name="psu_ip3v3_tm"  type="analog_data"/>
+             <xs:element name="pdu_ivbus_tm"  type="analog_data"/>
+             <xs:element name="pv_tpsxp_tm"   type="analog_data"/>
+             <xs:element name="pv_tpsxn_tm"   type="analog_data"/>
+             <xs:element name="pv_tpsyp_tm"   type="analog_data"/>
+             <xs:element name="pv_tpsyn_tm"   type="analog_data"/>
+             <xs:element name="pv_tpszp_tm"   type="analog_data"/>
+             <xs:element name="pv_ispxp_tm"   type="analog_data"/>
+             <xs:element name="pv_ispxn_tm"   type="analog_data"/>
+             <xs:element name="pv_ispyp_tm"   type="analog_data"/>
+             <xs:element name="pv_ispyn_tm"   type="analog_data"/>
+             <xs:element name="pv_ispzp_tm"   type="analog_data"/>
+             <xs:element name="obc_t_tm"      type="analog_data"/>
+             <xs:element name="mgm1_t_tm"     type="analog_data"/>
+             <xs:element name="mgm2_t_tm"     type="analog_data"/>
+             <xs:element name="mgm3_t_tm"     type="analog_data"/>
+             <xs:element name="mgm1_x_tm"     type="analog_data"/>
+             <xs:element name="mgm1_y_tm"     type="analog_data"/>
+             <xs:element name="mgm1_z_tm"     type="analog_data"/>
+             <xs:element name="mgm2_x_tm"     type="analog_data"/>
+             <xs:element name="mgm2_y_tm"     type="analog_data"/>
+             <xs:element name="mgm2_z_tm"     type="analog_data"/>
+             <xs:element name="mgm3_x_tm"     type="analog_data"/>
+             <xs:element name="mgm3_y_tm"     type="analog_data"/>
+             <xs:element name="mgm3_z_tm"     type="analog_data"/>
+             <xs:element name="mgt_tx_tm"     type="analog_data"/>
+             <xs:element name="modem_t_tr_tm" type="analog_data"/>
+             <xs:element name="ebox_t_int_tm" type="analog_data"/>
+             <xs:element name="ebox_t_ext_tm" type="analog_data"/>
+             <xs:element name="batt_t_ext_tm" type="analog_data"/>
+             <xs:element name="batt_t_int_tm" type="analog_data"/>
+             <xs:element name="ss6_xp_tm"     type="analog_data"/>
+             <xs:element name="ss6_xn_tm"     type="analog_data"/>
+             <xs:element name="ss6_yp_tm"     type="analog_data"/>
+             <xs:element name="ss6_yn_tm"     type="analog_data"/>
+             <xs:element name="ss6_zp_tm"     type="analog_data"/>
+             <xs:element name="ss6_zn_tm"     type="analog_data"/>
+             <xs:element name="rw1_t_tm"      type="analog_data"/>
+             <xs:element name="rw2_t_tm"      type="analog_data"/>
+             <xs:element name="mts_p1tts1_tm" type="analog_data"/>
+             <xs:element name="mts_p1tts2_tm" type="analog_data"/>
+             <xs:element name="mts_p1tts3_tm" type="analog_data"/>
+             <xs:element name="mts_p1tts4_tm" type="analog_data"/>
+             <xs:element name="mts_p1tts5_tm" type="analog_data"/>
+             <xs:element name="mts_p1tts6_tm" type="analog_data"/>
+          </xs:sequence>
+  </xs:complexType>
+
+    <xs:complexType name="status_signal_table">
+          <xs:sequence>
+             <xs:element name="das_p3v"    type="xs:boolean"/>
+             <xs:element name="das_p5v"    type="xs:boolean"/>
+             <xs:element name="das_p15v"   type="xs:boolean"/>
+             <xs:element name="das_n15v"   type="xs:boolean"/>
+             <xs:element name="pdu_p3v3"   type="xs:boolean"/>
+             <xs:element name="pdu_p5v"    type="xs:boolean"/>
+             <xs:element name="mgm1_p5v"   type="xs:boolean"/>
+             <xs:element name="mgm2_p5v"   type="xs:boolean"/>
+             <xs:element name="mgm3_p15v"  type="xs:boolean"/>
+             <xs:element name="mgm3_n15v"  type="xs:boolean"/>
+             <xs:element name="mgt_x_vbus" type="xs:boolean"/>
+             <xs:element name="temp_a_p5v" type="xs:boolean"/>
+             <xs:element name="temp_b_p5v" type="xs:boolean"/>
+             <xs:element name="modem_vbus" type="xs:boolean"/>
+             <xs:element name="rw_p5v"     type="xs:boolean"/>
+             <xs:element name="rw_vbus"    type="xs:boolean"/>
+             <xs:element name="mts_vbus"   type="xs:boolean"/>
+             <xs:element name="boom1_vbus" type="xs:boolean"/>
+             <xs:element name="boom2_vbus" type="xs:boolean"/>
+             <xs:element name="ttc_stat"   type="xs:boolean"/>
+             <xs:element name="sma_sb01"   type="xs:boolean"/>
+             <xs:element name="sma_sb02"   type="xs:boolean"/>
+          </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mts_tm_data">
+      <xs:sequence minOccurs="0" maxOccurs="8"> <!--Max_Buffers_Sample: 8 is -->
+          <xs:element name="mts_sample" type="mts_sample"/>
+      </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mts_sample">
+          <xs:sequence>
+             <xs:element name="timestamp"            type="mission_time"/>
+             <xs:element name="temperatures"         type="temperature_values"/>
+             <xs:element name="heaters"              type="heater_setting"/>
+             <xs:element name="is_at_essays"         type="xs:boolean"/>
+             <xs:element name="current_essay"        type="essays"/>
+             <xs:element name="current_step"         type="xs:unsignedInt"/> 
+             <!-- 1..9 -->
+             <xs:element name="current_verification" type="verifications"/>
+          </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="temperature_values">
+      <xs:sequence>
+          <xs:element name="mts_p1tts1_tm" type="analog_data"/>
+          <xs:element name="mts_p1tts2_tm" type="analog_data"/>
+          <xs:element name="mts_p1tts3_tm" type="analog_data"/>
+          <xs:element name="mts_p1tts4_tm" type="analog_data"/>
+          <xs:element name="mts_p1tts5_tm" type="analog_data"/>
+          <xs:element name="mts_p1tts6_tm" type="analog_data"/>
+      </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="heater_setting">
+          <xs:sequence>
+             <xs:element name="mts1"    type="xs:boolean"/>
+             <xs:element name="mts2"    type="xs:boolean"/>
+             <xs:element name="mts3"    type="xs:boolean"/>
+         </xs:sequence>
+  </xs:complexType>
+
+  <!-- MTS command type -->
+  <xs:simpleType name="essays">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ALL_ESSAYS"/>
+      <xs:enumeration value="PERFORMANCE_1"/>
+      <xs:enumeration value="PERFORMANCE_2"/>
+      <xs:enumeration value="PERFORMANCE_3"/>
+      <xs:enumeration value="PERFORMANCE_4"/>
+      <xs:enumeration value="CYCLING_5"/>
+      <xs:enumeration value="CYCLING_6"/>
+      <xs:enumeration value="CYCLING_7"/>
+      <xs:enumeration value="TRANSITION_8"/>
+      <xs:enumeration value="TRANSITION_9"/>
+      <xs:enumeration value="TRANSITION_10"/>
+      <xs:enumeration value="TRANSITION_11"/>
+      <xs:enumeration value="LIFE_12"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="verifications">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CHECK_SENSORS"/>
+      <xs:enumeration value="CHECK_HEATER_1"/>
+      <xs:enumeration value="CHECK_HEATER_2"/>
+      <xs:enumeration value="CHECK_HEATER_3"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+ <xs:complexType name="rw_tm">
+          <xs:sequence>
+             <xs:element name="header"             
+                         type="rw_tm_header"/>
+             <xs:element name="data"               
+                         type="rw_tm_body"/>
+          </xs:sequence>
+  </xs:complexType>
+
+
+ <xs:complexType name="rw_tm_header">
+          <xs:sequence>
+             <xs:element name="id_test"            type="test_type"/>
+             <xs:element name="test_result"        type="result_type"/>
+             <xs:element name="round_id"           type="round_type"/>
+             <xs:element name="number_of_samples"  type="tm_package_samples"/>
+             <xs:element name="total_samples"      type="total_test_samples"/> 
+          </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="tm_package_samples">
+    <xs:restriction base="xs:unsignedInt">
+       <xs:minInclusive value="0"/> 
+       <xs:maxInclusive value="9"/> 
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="total_test_samples">
+    <xs:restriction base="xs:unsignedInt">
+       <xs:minInclusive value="0"/> 
+       <xs:maxInclusive value="1060"/> 
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <xs:simpleType name="test_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CONNECTION"/>
+      <xs:enumeration value="ACTIVATION"/>
+      <xs:enumeration value="SPEED_MODE"/>
+      <xs:enumeration value="CURRENT_MODE"/>
+      <xs:enumeration value="TORQUE_MODE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="result_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="FAILURE"/>
+      <xs:enumeration value="OVERSPEED"/>
+      <xs:enumeration value="CHANGED_MODE"/>
+      <xs:enumeration value="RW_DID_NOT_START"/>
+      <xs:enumeration value="COMMUNICATIONS_ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="round_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="R1_CONNECTION"/>
+      <xs:enumeration value="R2_CONNECTION"/>
+      <xs:enumeration value="R1_POSITIVE"/>
+      <xs:enumeration value="R1_NEGATIVE"/>
+      <xs:enumeration value="R2_POSITIVE"/>
+      <xs:enumeration value="R2_NEGATIVE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  
+  <xs:complexType name="rw_tm_body">
+      <xs:sequence minOccurs="0" maxOccurs="9">
+          <xs:element name="sample_data" type="sample_data"/>
+      </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sample_data">
+          <xs:sequence>
+             <xs:element name="mission_clock"  type="mission_time"/>
+             <xs:element name="wheel_speed"    type="xs:float"/>  
+             <xs:element name="motor_current"  type="xs:float"/> 
+             <!-- Interfaces.IEEE_Float_32 => xs.float-->         
+         </xs:sequence>
+  </xs:complexType>
+
+
+<!-- Experiment adcs_protections_commissioning -->
+
+ <xs:complexType name="mgm_mgt_pa_data">
+          <xs:sequence>
+             <xs:element name="mgm_pa_data"             
+                         type="mgm_activation_array"/>
+             <xs:element name="mgt_pa_data"               
+                         type="activation_data"/>
+          </xs:sequence>
+  </xs:complexType>
+
+ <xs:complexType name="mgm_activation_array">
+          <xs:sequence>
+             <xs:element name="mgm1"             
+                         type="activation_data"/>
+             <xs:element name="mgm2"               
+                         type="activation_data"/>
+             <xs:element name="mgm3"               
+                         type="activation_data"/>
+          </xs:sequence>
+  </xs:complexType>
+
+   <xs:complexType name="activation_data">
+          <xs:sequence>
+             <xs:element name="active"             
+                         type="xs:boolean"/>
+             <xs:element name="attemps"               
+                         type="xs:unsignedInt"/>
+          </xs:sequence>
+  </xs:complexType>
+
+<!--   Experiement adcs_mgm_commissioning -->
+
+   <xs:complexType name="mgm_pm_data">
+          <xs:sequence>
+             <xs:element name="ok"             
+                         type="xs:boolean"/>
+             <xs:element name="attemps"               
+                         type="xs:unsignedInt"/>
+             <xs:element name="values"               
+                         type="mgm_values_array"/>
+          </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mgm_values_array">
+          <xs:sequence>
+             <xs:element name="mgm1_xaxis"             
+                         type="mgm_values"/>
+             <xs:element name="mgm1_yaxis"             
+                         type="mgm_values"/>
+             <xs:element name="mgm1_zaxis"             
+                         type="mgm_values"/>
+             <xs:element name="mgm2_xaxis"             
+                         type="mgm_values"/>
+             <xs:element name="mgm2_yaxis"             
+                         type="mgm_values"/>
+             <xs:element name="mgm2_zaxis"             
+                         type="mgm_values"/>
+             <xs:element name="mgm3_xaxis"             
+                         type="mgm_values"/>
+             <xs:element name="mgm3_yaxis"             
+                         type="mgm_values"/>
+             <xs:element name="mgm3_zaxis"             
+                         type="mgm_values"/>
+          </xs:sequence>
+  </xs:complexType>
+
+    <xs:complexType name="mgm_values">
+          <xs:sequence>
+             <xs:element name="min"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="max"             
+                         type="xs:unsignedInt"/>
+          </xs:sequence>
+  </xs:complexType>
+
+<!-- Experiment  adcs_mgt_commissioning -->
+   <xs:complexType name="mgm_mgt_data">
+          <xs:sequence>
+             <xs:element name="mgm_values"             
+                         type="mgm_data"/>
+             <xs:element name="mgt_axis"               
+                         type="adcs_axis"/>
+             <xs:element name="mgt_direction"               
+                         type="mgt_activation"/>
+          </xs:sequence>
+  </xs:complexType>
+
+
+<!--   The definition of mgm_datain bt.adcs, it is defined as an array 1..cycles
+  where cycles is defined as := constant 1. So, I decided to do not define 
+  mgm as an array as a single record on mgm_readings.
+  The following structure in two steps for facilating changing to array
+   (AA, 20190522) -->
+
+   <xs:complexType name="mgm_data">
+          <xs:sequence>
+             <xs:element name="mgm_readings"             
+                         type="mgm_readings"/>
+          </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mgm_readings">
+          <xs:sequence>
+             <xs:element name="mgm1_xaxis"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="mgm1_yaxis"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="mgm1_zaxis"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="mgm2_xaxis"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="mgm2_yaxis"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="mgm2_zaxis"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="mgm3_xaxis"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="mgm3_yaxis"             
+                         type="xs:unsignedInt"/>
+             <xs:element name="mgm3_zaxis"             
+                         type="xs:unsignedInt"/>
+          </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="adcs_axis">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="X_AXIS"/>
+      <xs:enumeration value="Y_AXIS"/>
+      <xs:enumeration value="Z_AXIS"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <xs:simpleType name="mgt_activation">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NONE"/>
+      <xs:enumeration value="POSITIVE_DIRECTION"/>
+      <xs:enumeration value="NEGATIVE_DIRECTION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+<!--  Experiment  platform_protections_commisioning -->
+  
+     <xs:complexType name="platform_activation_data">
+          <xs:sequence>
+             <xs:element name="das"             
+                         type="activation_data"/>
+             <xs:element name="temp"               
+                         type="activation_data"/>
+          </xs:sequence>
+      </xs:complexType>
+
+</xs:schema>
